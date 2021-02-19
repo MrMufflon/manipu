@@ -91,5 +91,29 @@ describe('BundleParser', () => {
     assert.equal(component.getInterfaces().length, 2);
     assert.equal(component.getInterfaces()[1], "interface2")
 
+  });
+
+  it('should parse impl declarations', () => {
+    const input = {
+      name: "bundlename",
+      components : [
+        {
+          name: "componentname",
+          impl: "./arst/qwfp/Class",
+          provides: ["interface1", "interface2"]
+        }
+      ]
+
+    };
+
+    const parser = BundleParser();
+    const bundle = parser.fromJson(input);
+    const component = bundle.getComponents().next().value;
+
+    assert.equal(component.getName(), "componentname");
+    assert.equal(component.getImplements(), "arst.qwfp.Class");
+    assert.equal(component.getInterfaces().length, 2);
+    assert.equal(component.getInterfaces()[1], "interface2")
+
   })
 });

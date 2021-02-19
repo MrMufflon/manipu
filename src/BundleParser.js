@@ -15,7 +15,14 @@ function toComponent(component) {
     providing && references.push(providing)
   });
 
-  return new Component(component.name, interfaces, references)
+  let impl = component["impl"];
+  if(impl&&impl.length){
+    impl = impl.split("/");
+    impl.shift();
+    impl = impl.join(".");
+  }
+
+  return new Component(component.name, interfaces, references, impl)
 }
 
 function BundleParser(){

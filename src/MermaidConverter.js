@@ -1,27 +1,15 @@
 module.exports.bundleToMarkdown = function (bundle) {
   if (!bundle) {
-    return `@startuml
-        title Bundle Diagram
-        @enduml`
+    return `classDiagram`
   }
-  return `@startuml
-    title Bundle Diagram
-    package "${bundle.getName()}" {
-        ${createComponents(bundle)}
-    }
-    ${createReferences([bundle], bundle.getComponents())}
-    @enduml`
+  return "classDiagram\n"+createComponents(bundle)+"\n"+createReferences([bundle], bundle.getComponents());
 };
 
 module.exports.bundlesToMarkdown = function (bundles) {
   if (!bundles) {
-    return `@startuml
-        title Bundle Diagram
-        @enduml`
+    return `classDiagram`
   }
-  let bundlesString = `@startuml
-    title Bundle Diagram
-    `;
+  let bundlesString = `classDiagram\n`;
   let referencesString = "";
   for (let bundle of bundles) {
     const name = bundle.getName();
@@ -29,13 +17,10 @@ module.exports.bundlesToMarkdown = function (bundles) {
     if (!name || components.length === 0 || name.includes("-config")) {
       continue
     }
-    bundlesString += `package "${name}" {
-      ${components}
-    }
-    `;
+    bundlesString += `${components}`;
     referencesString += `${createReferences(bundles, bundle.getComponents())}`
   }
-  bundlesString = bundlesString + referencesString + `@enduml`;
+  bundlesString = bundlesString + referencesString;
   return bundlesString;
 };
 
@@ -44,9 +29,16 @@ function createComponents(bundle) {
   const components = bundle.getComponents();
   for (let component of components) {
     let interfaces = component.getInterfaces();
-    let interfacesString = interfaces.length ? ` <<${interfaces.join(",")}>>` : ""
-    result += `[${component.getName()}]${interfacesString}
-        `;
+    let impl = component.getImplements();
+    let implString = impl&&impl.length ? "~"+impl+"~" : "";
+    let interfacesString = interfaces.length ? `\t<<${interfaces.join(",")}>>` : "";
+    result += ("class " +component.getName()+implString);
+    if(interfaces.length){
+        result += " {\n"+interfacesString+"\n}\n";
+    } else{
+      result += "\n"
+    }
+    
   }
   return result;
 }
@@ -58,8 +50,7 @@ function createReferences(bundles, components) {
     for (let interfaceName of references) {
       const refComponents = getComponentsByInterface(bundles, interfaceName);
       for (let refComponent of refComponents) {
-        result += `[${component.getName()}] --> [${refComponent.getName()}]
-                `;
+        result += `${component.getName()} --> ${refComponent.getName()}\n`;
       }
     }
   }

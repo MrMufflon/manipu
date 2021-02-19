@@ -4,14 +4,14 @@ const PumlConverter = require('../src/PumlConverter')
 let assert = require('assert');
 
 describe('PumlConverter', function () {
-    describe('bundleToPuml', function () {
+    describe('bundleToMarkdown', function () {
         it('should return puml string', function () {
-            const result = PumlConverter.bundleToPuml();
+            const result = PumlConverter.bundleToMarkdown();
             assert(result.includes(`title Bundle Diagram`));
         });
         it('should return puml for bundle without components', function () {
             const bundle = new Bundle("map-init");
-            const result = PumlConverter.bundleToPuml(bundle);            
+            const result = PumlConverter.bundleToMarkdown(bundle);            
             assert(result.includes(`package "map-init"`));
         });
         it('should return puml for bundle with components', function () {
@@ -20,7 +20,7 @@ describe('PumlConverter', function () {
             const c2 = new Component("Component2");
             bundle.addComponent(c1);
             bundle.addComponent(c2);
-            const result = PumlConverter.bundleToPuml(bundle);            
+            const result = PumlConverter.bundleToMarkdown(bundle);            
             assert(result.includes(`[Component1]`));
             assert(result.includes(`[Component2]`));
         });
@@ -30,14 +30,14 @@ describe('PumlConverter', function () {
             const c2 = new Component("Component2", ["i2"]);
             bundle.addComponent(c1);
             bundle.addComponent(c2);
-            const result = PumlConverter.bundleToPuml(bundle);            
+            const result = PumlConverter.bundleToMarkdown(bundle);            
             assert(result.includes(`[Component1] --> [Component2]`));
             assert(result.includes(`[Component2] <<i2>>`));
         });
     });
-    describe('bundlesToPuml', function () {
+    describe('bundlesToMarkdown', function () {
         it('should return puml with title for empty bundle list', function () {
-            const result = PumlConverter.bundlesToPuml();
+            const result = PumlConverter.bundlesToMarkdown();
             assert(result.includes(`title Bundle Diagram`));
         });
         it('should return puml with bundle for single bundle', function () {
@@ -46,7 +46,7 @@ describe('PumlConverter', function () {
           const c2 = new Component("Component2", ["i2"]);
           bundle.addComponent(c1);
           bundle.addComponent(c2);
-          const result = PumlConverter.bundlesToPuml([bundle]);
+          const result = PumlConverter.bundlesToMarkdown([bundle]);
           assert(result.includes(`[Component1] --> [Component2]`));
           assert(result.includes(`[Component2] <<i2>>`));
         });
@@ -63,7 +63,7 @@ describe('PumlConverter', function () {
           bundle1.addComponent(c3);
           bundle1.addComponent(c4);
 
-          const result = PumlConverter.bundlesToPuml([bundle1, bundle2]);
+          const result = PumlConverter.bundlesToMarkdown([bundle1, bundle2]);
           assert(result.includes(`[Component3] --> [Component4]`));
           assert(result.includes(`[Component4] --> [Component1]`));
           assert(result.includes(`[Component4] --> [Component2]`));

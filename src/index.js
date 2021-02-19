@@ -1,6 +1,7 @@
 const ManifestReader = require('./ManifestReader');
 const PumlConverter = require('./PumlConverter');
 const FolderParser = require('./FolderParser');
+const MermaidConverter = require('./MermaidConverter');
 
 const fs = require('fs');
 const {Command, flags} = require('@oclif/command');
@@ -18,14 +19,23 @@ class ManipuCommand extends Command {
         let bndl = ManifestReader(path).getBundle();
         bundles.push(bndl);
       });
-      result = PumlConverter.bundlesToPuml(bundles);
+      if (flags.type === "puml"){
+        result = PumlConverter.bundlesToMarkdown(bundles);
+      }else{
+        result = MermaidConverter.bundlesToMarkdown(bundles);
+      }
+      
 
     } else {
       let bundle = ManifestReader(flags.path + "/manifest.json").getBundle();
-      result = PumlConverter.bundleToPuml(bundle);
+      if (flags.type === "puml"){
+        result = PumlConverter.bundlesToMarkdown(bundle);
+      }else{
+        result = MermaidConverter.bundlesToMarkdown(bundle);
+      }
     }
 
-    fs.writeFile(flags.path + "/bundle.puml", result, function (err) {
+    fs.writeFile(flags.path + "/bundle."+flags.type, result, function (err) {
       if (err) {
         return console.log(err);
       }
@@ -45,6 +55,7 @@ ManipuCommand.flags = {
   version: flags.version({char: 'v'}),
   // add --help flag to show CLI version
   help: flags.help({char: 'h'}),
+  type: flags.string({char: 't', description: 'mmd or puml'}),
   name: flags.string({char: 'n', description: 'name to print'}),
   path: flags.string({char: 'p', description: 'dir of manifest.json'}),
   recursive: flags.boolean({char: 'r', description: 'read dirs recursive', required: false})
